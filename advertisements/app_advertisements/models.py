@@ -1,10 +1,11 @@
 from django.db import models
 from django.contrib import admin
-from django.utils.html import format_html
 from django.utils import timezone
+from django.shortcuts import reverse
+from django.utils.html import format_html
 from django.contrib.auth import get_user_model
 
-user = get_user_model()
+User = get_user_model()
 
 
 class Advertisement(models.Model):
@@ -15,8 +16,11 @@ class Advertisement(models.Model):
     auction = models.BooleanField("Торг", help_text="Укажите возможен ли торг")
     create_at = models.DateTimeField("Время создания", auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(user, verbose_name="Пользователь", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, verbose_name="Пользователь", on_delete=models.CASCADE)
     image = models.ImageField('Изображение', upload_to='advertisements/')
+
+    def __str__(self):
+        return f"Advertisement(id={self.id}, title={self.title}, price = {self.price}, user = {self.user})"
 
     @admin.display(description="Дата создания")
     def created_date(self):
@@ -40,12 +44,12 @@ class Advertisement(models.Model):
     def view_image(self):
         return format_html(
             '''<a href="{}" class="nav-link">
-            <img src="{}" class="img-fluid rounded-start" alt="Card title" width='70' alt='Пользователь не предоставил изображение'>
+            <img src="{}" class="img-fluid rounded-start" style="max-width: 80px; max-height: 80px;" alt='Пользователь не предоставил\n изображение'>
             </a>'''.format(self.image.url, self.image.url)
         )
 
-    def __str__(self):
-        return f"Advertisement(id={self.id}, title={self.title}, price = {self.price})"
-
     class Meta:
         db_table = "advertisements"
+
+    def get_url(self):
+        return reverse('adv-detail', kwargs={'pk': self.pk})
