@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'app_advertisements',
     'test_django',
     'app_lesson_4',
+    'app_auth',
 ]
 
 MIDDLEWARE = [
